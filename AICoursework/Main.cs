@@ -37,24 +37,24 @@ for (int i = 0; i < listOfCoordinates.Count; i += 2)
 //}
 
 var toCav = 0;
-var width = Math.Sqrt(matrix.Count);
+
 for (int i = 0; i < matrix.Count; i++)
 {
 
     
     if (Int32.Parse(matrix[i]) != 0)
     {
-        var fromCav = (int)Math.Floor(i / width);
-        listOfCaverns[fromCav].AddNeighbour(listOfCaverns[toCav]);
+        var fromCav = (int)Math.Floor((double)i / (double)numOfCaves);
+        listOfCaverns[toCav].AddNeighbour(listOfCaverns[fromCav]);
     }
 
     toCav++;
-    if (toCav == width)
+
+    if (toCav == numOfCaves)
         toCav = 0;
     
 
 }
-
 
 
 //for (int i = 0; i < Math.Sqrt(matrix.Count); i++)
