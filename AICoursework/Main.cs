@@ -6,6 +6,10 @@ using AICoursework;
 var watch = new Stopwatch();
 watch.Start();
 
+List<Cavern> listOfCaverns = new List<Cavern>();
+Console.WriteLine(System.AppContext.BaseDirectory);
+string text = File.ReadAllText(@"C:\Users\giana\Desktop\Year 3 TRI 2\AI Coursework\generated2000and5000\generated5000-1.cav");
+List<String> values = text.Split(',').ToList();
 // Reading the file
 var listOfCaverns = new List<Cavern>();
 var text = File.ReadAllText(@"C:\Users\giana\Desktop\Year 3 TRI 2\AI Coursework\generated2000and5000\generated5000-1.cav");
@@ -54,6 +58,16 @@ for (int i = 0; i < matrix.Count; i++)
 }
 
 
+//for (int i = 0; i < Math.Sqrt(matrix.Count); i++)
+//{
+//    for (int j = 0; j < Math.Sqrt(matrix.Count); j++)
+//    {
+//        if (Int32.Parse(matrix[i + j * numOfCaves]) == 1)
+//        {
+//            listOfCaverns[i].AddNeighbour(listOfCaverns[j]);
+//        }
+//    }
+//}
 
 // Search algorithm. Reverses the order of the list and prints it to the console
 List<Cavern> answers = Search(listOfCaverns);
@@ -122,7 +136,7 @@ List<Cavern> Search(List<Cavern> caverns)
         // If we arrived at the end of the caverns then build the path
         if (current == caverns[^1])
         {
-            
+
             var temp = current;
             path.Add(temp);
 
@@ -136,7 +150,7 @@ List<Cavern> Search(List<Cavern> caverns)
             path.Add(caverns[0]);
             return path;
         }
-            
+
 
         // Remove the current cavern from the open set because we are "visiting" it
         openSet.Remove(current);
@@ -187,8 +201,6 @@ List<Cavern> Search(List<Cavern> caverns)
                 neighbor.HVal = GetDistanceBetweenCaverns(neighbor, caverns[^1]);
                 neighbor.FVal = neighbor.GVal + neighbor.HVal;
                 neighbor.Parent = current;
-            }
-
             }
 
         }
