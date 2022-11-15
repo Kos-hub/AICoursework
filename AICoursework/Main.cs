@@ -27,7 +27,7 @@ var matrix = values;
 
 
 // Getting the list of coordinates
-for (int i = 0; i < listOfCoordinates.Count; i += 2)
+for (var i = 0; i < listOfCoordinates.Count; i += 2)
 {
     Cavern cavern = new Cavern(i/2, Int32.Parse(listOfCoordinates[i]), Int32.Parse(listOfCoordinates[i + 1]));
     listOfCaverns.Add(cavern);
@@ -36,7 +36,7 @@ for (int i = 0; i < listOfCoordinates.Count; i += 2)
 
 // Matrix logic that avoids a 2D Array
 var toCav = 0;
-for (int i = 0; i < matrix.Count; i++)
+for (var i = 0; i < matrix.Count; i++)
 {
 
     
@@ -54,7 +54,7 @@ for (int i = 0; i < matrix.Count; i++)
 }
 
 // Search algorithm. Reverses the order of the list and prints it to the console
-List<Cavern> answers = Search(listOfCaverns);
+var answers = Search(listOfCaverns);
 answers.Reverse();
 foreach (var answer in answers)
 {
@@ -75,10 +75,10 @@ Console.WriteLine("Elapsed milliseconds = " + watch.ElapsedMilliseconds);
 // Getting Euclidean distance between two caverns
 float GetDistanceBetweenCaverns(Cavern fromCavern, Cavern toCavern)
 {
-    float distance = 0.0f;
+    var distance = 0.0f;
 
-    float diffOfX = MathF.Pow(toCavern.Coord[0] - fromCavern.Coord[0], 2);
-    float diffOfY = MathF.Pow(toCavern.Coord[1] - fromCavern.Coord[1], 2);
+    var diffOfX = MathF.Pow(toCavern.Coord[0] - fromCavern.Coord[0], 2);
+    var diffOfY = MathF.Pow(toCavern.Coord[1] - fromCavern.Coord[1], 2);
 
     distance = MathF.Sqrt(diffOfX + diffOfY);
     return distance;
@@ -105,7 +105,7 @@ List<Cavern> Search(List<Cavern> caverns)
 
         // Getting the lowest F Value in the neighbor list
         var lowestIndex = 0;
-        for (int i = 0; i < openSet.Count; i++)
+        for (var i = 0; i < openSet.Count; i++)
         {
             if (openSet[i].FVal < openSet[lowestIndex].FVal)
             {
