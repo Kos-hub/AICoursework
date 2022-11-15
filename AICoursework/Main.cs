@@ -6,10 +6,6 @@ using AICoursework;
 var watch = new Stopwatch();
 watch.Start();
 
-List<Cavern> listOfCaverns = new List<Cavern>();
-Console.WriteLine(System.AppContext.BaseDirectory);
-string text = File.ReadAllText(@"C:\Users\giana\Desktop\Year 3 TRI 2\AI Coursework\generated2000and5000\generated5000-1.cav");
-List<String> values = text.Split(',').ToList();
 // Reading the file
 var listOfCaverns = new List<Cavern>();
 var text = File.ReadAllText(@"C:\Users\giana\Desktop\Year 3 TRI 2\AI Coursework\generated2000and5000\generated5000-1.cav");
@@ -56,18 +52,6 @@ for (int i = 0; i < matrix.Count; i++)
         toCav = 0;
     
 }
-
-
-//for (int i = 0; i < Math.Sqrt(matrix.Count); i++)
-//{
-//    for (int j = 0; j < Math.Sqrt(matrix.Count); j++)
-//    {
-//        if (Int32.Parse(matrix[i + j * numOfCaves]) == 1)
-//        {
-//            listOfCaverns[i].AddNeighbour(listOfCaverns[j]);
-//        }
-//    }
-//}
 
 // Search algorithm. Reverses the order of the list and prints it to the console
 List<Cavern> answers = Search(listOfCaverns);
