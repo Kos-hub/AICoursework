@@ -2,24 +2,28 @@
 using System.Diagnostics;
 using AICoursework;
 
+// Stopwatch for debugging purposes
 var watch = new Stopwatch();
+watch.Start();
 
-List<Cavern> listOfCaverns = new List<Cavern>();
-Console.WriteLine(System.AppContext.BaseDirectory);
-string text = File.ReadAllText(@".\generated5000-1.cav");
-List<String> values = text.Split(',').ToList();
+// Reading the file
+var listOfCaverns = new List<Cavern>();
+var text = File.ReadAllText(@"C:\Users\giana\Desktop\Year 3 TRI 2\AI Coursework\generated2000and5000\generated5000-1.cav");
+var values = text.Split(',').ToList();
 
 
-int numOfCaves = Int32.Parse(values[0]);
+// Getting the size of the Caverns and printing them out in the console
+var numOfCaves = Int32.Parse(values[0]);
 values.RemoveAt(0);
 Console.WriteLine("There are " + numOfCaves + " caves");
 
-watch.Start();
-List<String> listOfCoordinates = values.GetRange(0,  numOfCaves * 2);
+// Getting the list of coordinates from the 
+var listOfCoordinates = values.GetRange(0,  numOfCaves * 2);
 values.RemoveRange(0, numOfCaves * 2);
 
 
-List<String> matrix = values;
+// Getting the values for the matrix
+var matrix = values;
 
 
 // Getting the list of coordinates
@@ -30,43 +34,47 @@ for (int i = 0; i < listOfCoordinates.Count; i += 2)
 }
 
 
-//// Printing all the list of coordinates
-//foreach (var c in listOfCaverns)
-//{
-//    Console.WriteLine("Cavern coords: " + c.Coord[0] + " " + c.Coord[1]);
-//}
-
-
-
-for (int i = 0; i < Math.Sqrt(matrix.Count); i++)
+// Matrix logic that avoids a 2D Array
+var toCav = 0;
+for (int i = 0; i < matrix.Count; i++)
 {
-    for (int j = 0; j < Math.Sqrt(matrix.Count); j++)
+
+    
+    if (Int32.Parse(matrix[i]) != 0)
     {
-        if (Int32.Parse(matrix[i + j * numOfCaves]) == 1)
-        {
-            listOfCaverns[i].AddNeighbour(listOfCaverns[j]);
-        }
+        var fromCav = (int)Math.Floor((double)i / (double)numOfCaves);
+        listOfCaverns[toCav].AddNeighbour(listOfCaverns[fromCav]);
     }
+
+    toCav++;
+
+    if (toCav == numOfCaves)
+        toCav = 0;
+    
 }
 
 
 
+// Search algorithm. Reverses the order of the list and prints it to the console
 List<Cavern> answers = Search(listOfCaverns);
 answers.Reverse();
-double length = 0;
 foreach (var answer in answers)
 {
     Console.Write(answer.Index + ",");
 }
 
+// If the array is empty, print 0
 if(answers.Count > 0)
     Console.WriteLine("\n" + answers[^1].GVal);
 else
     Console.WriteLine(0);
 
+// Performance results
 watch.Stop();
 Console.WriteLine("Elapsed milliseconds = " + watch.ElapsedMilliseconds);
 
+
+// Getting Euclidean distance between two caverns
 float GetDistanceBetweenCaverns(Cavern fromCavern, Cavern toCavern)
 {
     float distance = 0.0f;
@@ -83,13 +91,21 @@ float GetDistanceBetweenCaverns(Cavern fromCavern, Cavern toCavern)
 List<Cavern> Search(List<Cavern> caverns)
 {
 
+    // This is the list of all the neighbors that we haven't visited yet
     var openSet = new List<Cavern> { caverns[0] };
+
+    // List of all the visited neighbors
     var closedSet = new List<Cavern>();
 
+    // Final path
     var path = new List<Cavern>();
 
+
+    // While the open set has still values in it
     while (openSet.Count > 0)
     {
+
+        // Getting the lowest F Value in the neighbor list
         var lowestIndex = 0;
         for (int i = 0; i < openSet.Count; i++)
         {
@@ -99,14 +115,18 @@ List<Cavern> Search(List<Cavern> caverns)
             }
         }
 
+        // Getting the current cavern with the lowest index
         var current = openSet[lowestIndex];
 
+
+        // If we arrived at the end of the caverns then build the path
         if (current == caverns[^1])
         {
             
             var temp = current;
             path.Add(temp);
 
+            // Backtracking using the Parent property
             while (temp.Parent.Index != 1)
             {
                 path.Add(temp.Parent);
@@ -118,40 +138,56 @@ List<Cavern> Search(List<Cavern> caverns)
         }
             
 
-
+        // Remove the current cavern from the open set because we are "visiting" it
         openSet.Remove(current);
+        
+        // Adding the current cavern to the closed set because we are "visiting" it
         closedSet.Add(current);
 
+
+        // Getting the list of the current cavern's neighbors
         var neighbors = current.Caverns;
 
         foreach (var neighbor in neighbors)
         {
-            if (!closedSet.Contains(neighbor))
+            // If we have been to that cavern already, skip everything
+            if (closedSet.Contains(neighbor)) continue;
+
+            // Getting the expected G score between the current cavern and the current neighbor
+            var tentativeGScore = current.GVal + GetDistanceBetweenCaverns(current, neighbor);
+
+            // Flag that tells if a new path has been found or not
+            var newPath = false;
+
+            // If it is already in the open set
+            if (openSet.Contains(neighbor))
             {
-                var tentativeGScore = current.GVal + GetDistanceBetweenCaverns(current, neighbor);
-
-                var newPath = false;
-                if (openSet.Contains(neighbor))
+                // If the current GScore is actually lower than the neighbor's GSCore
+                if (tentativeGScore < neighbor.GVal)
                 {
-                    if (tentativeGScore < neighbor.GVal)
-                    {
-                        neighbor.GVal = tentativeGScore;
-                        newPath = true;
-                    }
-                }
-                else
-                {
+                    // Set the neighbor's GSCore to the new GValue
                     neighbor.GVal = tentativeGScore;
+
+                    // And set this to true because we found a better new path
                     newPath = true;
-                    openSet.Add(neighbor);
                 }
 
-                if (newPath)
-                {
-                    neighbor.HVal = GetDistanceBetweenCaverns(neighbor, caverns[^1]);
-                    neighbor.FVal = neighbor.GVal + neighbor.HVal;
-                    neighbor.Parent = current;
-                }
+            }
+            else
+            {
+                // If it is not in the open set and it is a new neighbor, then set its GScore and set the new path to true
+                neighbor.GVal = tentativeGScore;
+                newPath = true;
+                openSet.Add(neighbor);
+            }
+
+            // This is required as it will ONLY update the heuristic and the F value when a new path or a better path is found
+            if (newPath)
+            {
+                neighbor.HVal = GetDistanceBetweenCaverns(neighbor, caverns[^1]);
+                neighbor.FVal = neighbor.GVal + neighbor.HVal;
+                neighbor.Parent = current;
+            }
 
             }
 
@@ -162,84 +198,3 @@ List<Cavern> Search(List<Cavern> caverns)
 
 }
 
-
-double GetHValue(List<Cavern> caverns, Cavern cavern)
-{
-    return GetDistanceBetweenCaverns(cavern, caverns[^1]);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Dictionary<Cavern, double> openList = new Dictionary<Cavern, double>();
-
-//List<Cavern> closedSet = new List<Cavern>();
-
-//openList.Add(caverns[0], GetHValue(caverns, caverns[0]));
-//while (openList.Count != 0)
-//{
-//    var current = openList.MinBy(x => x.Value).Key;
-
-//    if (current.Index == caverns[^1].Index)
-//        return closedSet;
-
-//    foreach (var neighbor in current.Caverns)
-//    {
-//        if (closedSet.Contains(neighbor)) 
-//            continue;
-//        double tentative_gScore = gScore[current] + GetDistanceBetweenCaverns(current, neighbor);
-
-
-//        double neighbor_gScore = 0;
-
-//        if (!gScore.TryGetValue(neighbor, out neighbor_gScore))
-//        {
-//            neighbor_gScore = Double.MaxValue;
-//        }
-
-//        if (tentative_gScore < neighbor_gScore)
-//        {
-//            closedSet.Add(neighbor);
-//            gScore[neighbor] = tentative_gScore;
-
-//            if (!openList.ContainsKey(neighbor))
-//            {
-//                openList.Add(neighbor, tentative_gScore + GetHValue(caverns, neighbor));
-//            }
-//        }
-
-//    }
-
-//    openList.Remove(current);
-//}
-
-//return closedSet;
