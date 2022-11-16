@@ -1,21 +1,16 @@
-﻿using System;
-using System.Diagnostics;
-using AICoursework;
+﻿using AICoursework;
 
-// Stopwatch for debugging purposes
-var watch = new Stopwatch();
-watch.Start();
 
 // Reading the file
 var listOfCaverns = new List<Cavern>();
-var text = File.ReadAllText(@"C:\Users\giana\Desktop\Year 3 TRI 2\AI Coursework\generated2000and5000\generated5000-1.cav");
+var file = Environment.GetCommandLineArgs()[1];
+var text = File.ReadAllText(@".\" + file + ".cav");
 var values = text.Split(',').ToList();
 
 
 // Getting the size of the Caverns and printing them out in the console
 var numOfCaves = Int32.Parse(values[0]);
 values.RemoveAt(0);
-Console.WriteLine("There are " + numOfCaves + " caves");
 
 // Getting the list of coordinates from the 
 var listOfCoordinates = values.GetRange(0,  numOfCaves * 2);
@@ -47,7 +42,6 @@ for (var i = 0; i < matrix.Count; i++)
     }
 
     toCav++;
-
     if (toCav == numOfCaves)
         toCav = 0;
     
@@ -56,20 +50,23 @@ for (var i = 0; i < matrix.Count; i++)
 // Search algorithm. Reverses the order of the list and prints it to the console
 var answers = Search(listOfCaverns);
 answers.Reverse();
-foreach (var answer in answers)
+
+using (var writer = new StreamWriter(@".\" + file + ".csn"))
 {
-    Console.Write(answer.Index + ",");
+    if (answers.Count > 0)
+    {
+        foreach (var a in answers)
+        {
+            writer.Write(a.Index + " ");
+        }
+
+        writer.Write("\n" + answers[^1].GVal);
+    }
+    else
+    {
+        writer.Write("0");
+    }
 }
-
-// If the array is empty, print 0
-if(answers.Count > 0)
-    Console.WriteLine("\n" + answers[^1].GVal);
-else
-    Console.WriteLine(0);
-
-// Performance results
-watch.Stop();
-Console.WriteLine("Elapsed milliseconds = " + watch.ElapsedMilliseconds);
 
 
 // Getting Euclidean distance between two caverns
@@ -85,7 +82,7 @@ float GetDistanceBetweenCaverns(Cavern fromCavern, Cavern toCavern)
 
 }
 
-
+// A* Search algorithm
 List<Cavern> Search(List<Cavern> caverns)
 {
 
